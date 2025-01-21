@@ -1,7 +1,7 @@
 let readline = require("readline")
 let fs = require("fs")
 const { trace } = require("console")
-let f1 = fs.createReadStream("./input3.txt", "utf-8")
+let f1 = fs.createReadStream("./test-cases/input3.txt", "utf-8")
 let rl = readline.createInterface({
     // input : process.stdin,
     input: f1,
@@ -80,35 +80,32 @@ class User {
         let sorted = this.users.sort(function (a, b) {
             if (a.score > b.score) {
                 return -1
-            } else if (a.score < b.score) {
+            }if (a.score < b.score) {
                 return 1
-            } else {
-                if (a.wins > b.wins) {
-                    return -1
-                } else if (a.wins < b.wins) {
-                    return 1
-                } else {
-                    if (a.draw > b.draw) {
-                        return -1
-                    } else if (a.draw < b.draw) {
-                        return 1
-                    } else {
-                        if (a.losses < b.losses) {
-                            return -1
-                        } else if (a.losses > b.losses) {
-                            return 1
-                        } else {
-                            if (a.username < b.username) {
-                                return -1
-                            } else if (a.username > b.username) {
-                                return 1
-                            } else {
-                                return 0
-                            }
-                        }
-                    }
-                }
             }
+            if (a.wins > b.wins) {
+                return -1
+            }if (a.wins < b.wins) {
+                return 1
+            }
+            if (a.draw > b.draw) {
+                    return -1
+            }if(a.draw < b.draw) {
+                    return 1
+            }
+            if (a.losses < b.losses) {
+                    return -1
+            }if (a.losses > b.losses) {
+                    return 1
+            }
+            if (a.username < b.username) {
+                    return -1
+            }if (a.username > b.username) {
+                    return 1
+            } else {
+                    return 0
+            }
+            
         })
 
 
