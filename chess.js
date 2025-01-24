@@ -1,7 +1,7 @@
 let readline = require("readline")
 let fs = require("fs")
 const { trace } = require("console")
-let f1 = fs.createReadStream("./input4.txt", "utf-8")
+let f1 = fs.createReadStream("./test-cases/input4.txt", "utf-8")
 let rl = readline.createInterface({
     // input : process.stdin,
     input: f1,
@@ -234,7 +234,7 @@ class Chess {
     static SITUATION_UNDID = 4
     static situation = Chess.SITUATION_NONE
 
-    static allMoves=[]
+    static allMoves = []
 
     lastLocation = null
     blackUndo = 2
@@ -373,7 +373,7 @@ class Chess {
 
 
     undo = () => {
-        
+
         if (this.undid == true) {
             console.log("you have used your undo for this turn")
             return
@@ -393,22 +393,22 @@ class Chess {
         else {
             Chess.situation = Chess.SITUATION_UNDID
             this.makeMove(this.lastLocation[0], this.lastLocation[1])
-            if(this.currentPlayerColor=="w"){
+            if (this.currentPlayerColor == "w") {
                 this.whiteUndo--
             }
-            else{
+            else {
                 this.blackUndo--
             }
             this.undid = true
         }
     }
 
-    undoNumber =()=>{
-        if(this.currentPlayerColor=="w"){
-            console.log("you have " +this.whiteUndo+ " undo moves")
+    undoNumber = () => {
+        if (this.currentPlayerColor == "w") {
+            console.log("you have " + this.whiteUndo + " undo moves")
         }
-        else{
-            console.log("you have " +this.blackUndo+ " undo moves")
+        else {
+            console.log("you have " + this.blackUndo + " undo moves")
         }
     }
 
@@ -473,17 +473,17 @@ class Chess {
 
             let b = this.selectedPiece.move(x, y, chess.board)
             if (b) {
-                if(Chess.situation == Chess.SITUATION_UNDID){
+                if (Chess.situation == Chess.SITUATION_UNDID) {
                     Chess.situation = Chess.SITUATION_SELECTED
                     return
-                    
+
                 }
                 Chess.situation = Chess.SITUATION_MOVED
             }
             else {
                 Chess.situation = Chess.SITUATION_SELECTED
             }
-            
+
         }
         else {
             console.log("do not have any selected piece")
@@ -491,18 +491,36 @@ class Chess {
 
     }
 
-    static showAllMoves=()=>{
-        this.allMoves.forEach(move=>{
-            console.log(move.moveMsg)
+    static showAllMoves = () => {
+
+        this.allMoves.forEach(move => {
+            if(move.killedMsg){
+                console.log(move.moveMsg + move.killedMsg)
+            }
+            else{
+                console.log(move.moveMsg)
+            }
+            
         })
     }
 
 
-    static showMoves=(playerColor)=>{
-        let moves = this.allMoves.filter(move =>
-            move.moveMsg[1]==playerColor
-        )
-        moves.forEach(move=>console.log(move.moveMsg))
+    static showMoves = (playerColor) => {
+
+            let moves = this.allMoves.filter(move =>
+                move.moveMsg[1] == playerColor
+            )
+            moves.forEach(move =>{
+                if(move.killedMsg){
+                    console.log(move.moveMsg + move.killedMsg)
+                }
+                else{
+                    console.log(move.moveMsg)
+                }
+                
+            })
+
+
     }
 
     help = () => {
@@ -587,15 +605,15 @@ class Chess {
 }
 
 
-class Result{
-    success=false
-    moveMsg=""
-    killedMsg=""
+class Result {
+    success = false
+    moveMsg = ""
+    killedMsg = ""
 
-    constructor(success,moveMsg,killedMsg){
-        this.success=success
-        this.moveMsg=moveMsg
-        this.killedMsg=killedMsg
+    constructor(success, moveMsg, killedMsg) {
+        this.success = success
+        this.moveMsg = moveMsg
+        this.killedMsg = killedMsg
     }
 
 }
@@ -664,7 +682,7 @@ class Rook extends Piece {
             }
             if (board[r1][c1] == null) {
 
-                let result=new Result(true,`${this.name}${this.color} ${this.y},${this.x} to ${y},${x}`)
+                let result = new Result(true, `${this.name}${this.color} ${this.y},${this.x} to ${y},${x}`)
                 Chess.allMoves.push(result)
                 board[r][c] = null
                 this.x = x
@@ -675,7 +693,7 @@ class Rook extends Piece {
             }
             if (this.color != board[r1][c1].color) {
 
-                let result=new Result(true,`${this.name}${this.color} ${this.y},${this.x} to ${y},${x} destroyed ${destroyedPiece}`,board[r1][c1].name+board[r1][c1].color)
+                let result = new Result(true, `${this.name}${this.color} ${this.y},${this.x} to ${y},${x}`, ` destroyed ${board[r1][c1].name}${board[r1][c1].color}`)
                 Chess.allMoves.push(result)
                 board[r][c] = null
                 this.x = x
@@ -724,7 +742,7 @@ class Knight extends Piece {
 
             if (board[r1][c1] == null) {
 
-                let result=new Result(true,`${this.name}${this.color} ${this.y},${this.x} to ${y},${x}`)
+                let result = new Result(true, `${this.name}${this.color} ${this.y},${this.x} to ${y},${x}`)
                 Chess.moves.push(result)
                 board[r][c] = null
                 this.x = x
@@ -735,7 +753,7 @@ class Knight extends Piece {
             }
             if (this.color != board[r1][c1].color) {
 
-                let result=new Result(true,`${this.name}${this.color} ${this.y},${this.x} to ${y},${x} destroyed ${destroyedPiece}`,board[r1][c1].name+board[r1][c1].color)
+                let result = new Result(true, `${this.name}${this.color} ${this.y},${this.x} to ${y},${x}`, ` destroyed ${board[r1][c1].name}${board[r1][c1].color}`)
                 Chess.moves.push(result)
                 this.x = x
                 this.y = y
@@ -787,7 +805,7 @@ class Bishop extends Piece {
             }
             if (board[r1][c1] == null) {
 
-                let result=new Result(true,`${this.name}${this.color} ${this.y},${this.x} to ${y},${x}`)
+                let result = new Result(true, `${this.name}${this.color} ${this.y},${this.x} to ${y},${x}`)
                 Chess.allMoves.push(result)
 
                 board[r][c] = null
@@ -800,7 +818,7 @@ class Bishop extends Piece {
             }
             if (this.color != board[r1][c1].color) {
 
-                let result=new Result(true,`${this.name}${this.color} ${this.y},${this.x} to ${y},${x} destroyed ${destroyedPiece}`,board[r1][c1].name+board[r1][c1].color)
+                let result = new Result(true, `${this.name}${this.color} ${this.y},${this.x} to ${y},${x}`, ` destroyed ${board[r1][c1].name}${board[r1][c1].color}`)
                 Chess.allMoves.push(result)
 
                 board[r][c] = null
@@ -875,7 +893,7 @@ class Queen extends Piece {
 
             if (board[r1][c1] == null) {
 
-                let result=new Result(true,`${this.name}${this.color} ${this.y},${this.x} to ${y},${x}`)
+                let result = new Result(true, `${this.name}${this.color} ${this.y},${this.x} to ${y},${x}`)
                 Chess.allMoves.push(result)
 
                 board[r][c] = null
@@ -887,7 +905,7 @@ class Queen extends Piece {
             }
             if (this.color != board[r1][c1].color) {
 
-                let result=new Result(true,`${this.name}${this.color} ${this.y},${this.x} to ${y},${x} destroyed ${destroyedPiece}`,board[r1][c1].name+board[r1][c1].color)
+                let result = new Result(true, `${this.name}${this.color} ${this.y},${this.x} to ${y},${x}`, ` destroyed ${board[r1][c1].name}${board[r1][c1].color}`)
                 Chess.allMoves.push(result)
 
                 board[r][c] = null
@@ -937,7 +955,7 @@ class King extends Piece {
 
             if (board[r1][c1] == null) {
 
-                let result=new Result(true,`${this.name}${this.color} ${this.y},${this.x} to ${y},${x}`)
+                let result = new Result(true, `${this.name}${this.color} ${this.y},${this.x} to ${y},${x}`)
                 Chess.allMoves.push(result)
 
                 board[r][c] = null
@@ -949,7 +967,7 @@ class King extends Piece {
             }
             if (this.color != board[r1][c1].color) {
 
-                let result=new Result(true,`${this.name}${this.color} ${this.y},${this.x} to ${y},${x} destroyed ${destroyedPiece}`,board[r1][c1].name+board[r1][c1].color)
+                let result = new Result(true, `${this.name}${this.color} ${this.y},${this.x} to ${y},${x}`, ` destroyed ${board[r1][c1].name}${board[r1][c1].color}`)
                 Chess.allMoves.push(result)
 
                 board[r][c] = null
@@ -992,7 +1010,7 @@ class Pawn extends Piece {
             if (this.color == "w") {
                 if ((r - r1) == 1 && c == c1 && board[r1][c1] == null) {
 
-                    let result=new Result(true,`${this.name}${this.color} ${this.y},${this.x} to ${y},${x}`)
+                    let result = new Result(true, `${this.name}${this.color} ${this.y},${this.x} to ${y},${x}`)
                     Chess.allMoves.push(result)
 
                     board[r][c] = null
@@ -1004,7 +1022,7 @@ class Pawn extends Piece {
                 }
                 else if ((r - r1) == 1 && Math.abs(c1 - c) == 1 && board[r1][c1] != null && this.color != board[r1][c1].color) {
 
-                    let result=new Result(true,`${this.name}${this.color} ${this.y},${this.x} to ${y},${x} destroyed ${destroyedPiece}`,board[r1][c1].name+board[r1][c1].color)
+                    let result = new Result(true, `${this.name}${this.color} ${this.y},${this.x} to ${y},${x}`, ` destroyed ${board[r1][c1].name}${board[r1][c1].color}`)
                     Chess.allMoves.push(result)
 
                     board[r][c] = null
@@ -1022,7 +1040,7 @@ class Pawn extends Piece {
                         }
                     }
 
-                    let result=new Result(true,`${this.name}${this.color} ${this.y},${this.x} to ${y},${x}`)
+                    let result = new Result(true, `${this.name}${this.color} ${this.y},${this.x} to ${y},${x}`)
                     Chess.allMoves.push(result)
 
                     board[r][c] = null
@@ -1043,7 +1061,7 @@ class Pawn extends Piece {
             if (this.color == "b") {
                 if ((r1 - r) == 1 && c == c1 && board[r1][c1] == null) {
 
-                    let result=new Result(true,`${this.name}${this.color} ${this.y},${this.x} to ${y},${x}`)
+                    let result = new Result(true, `${this.name}${this.color} ${this.y},${this.x} to ${y},${x}`)
                     Chess.allMoves.push(result)
 
                     board[r][c] = null
@@ -1055,7 +1073,7 @@ class Pawn extends Piece {
                 }
                 else if ((r1 - r) == 1 && Math.abs(c1 - c) == 1 && board[r1][c1] != null && this.color != board[r1][c1].color) {
 
-                    let result=new Result(true,`${this.name}${this.color} ${this.y},${this.x} to ${y},${x} destroyed ${destroyedPiece}`,board[r1][c1].name+board[r1][c1].color)
+                    let result = new Result(true, `${this.name}${this.color} ${this.y},${this.x} to ${y},${x}`, ` destroyed ${board[r1][c1].name}${board[r1][c1].color}`)
                     Chess.allMoves.push(result)
 
                     board[r][c] = null
@@ -1073,7 +1091,7 @@ class Pawn extends Piece {
                         }
                     }
 
-                    let result=new Result(true,`${this.name}${this.color} ${this.y},${this.x} to ${y},${x}`)
+                    let result = new Result(true, `${this.name}${this.color} ${this.y},${this.x} to ${y},${x}`)
                     Chess.allMoves.push(result)
 
                     board[r][c] = null
@@ -1179,11 +1197,11 @@ rl.on('line', function (line) {
     }
     else if (parts[0] == "show_moves" && parts[1] == "-all" && chess.whiteUser != null) {
         Chess.showAllMoves()
-        
+
     }
     else if (parts[0] == "show_moves" && chess.whiteUser != null) {
         Chess.showMoves(chess.currentPlayerColor)
-    
+
     }
 
     else if (parts[0] == "scoreboard" && chess.whiteUser != null) {
