@@ -1,7 +1,7 @@
 let readline = require("readline")
 let fs = require("fs")
 const { trace } = require("console")
-let f1 = fs.createReadStream("./test-cases/input4.txt", "utf-8")
+let f1 = fs.createReadStream("./input4.txt", "utf-8")
 let rl = readline.createInterface({
     // input : process.stdin,
     input: f1,
@@ -234,7 +234,7 @@ class Chess {
     static SITUATION_UNDID = 4
     static situation = Chess.SITUATION_NONE
 
-    static allMoves = []
+    allMoves = []
 
     lastLocation = null
     blackUndo = 2
@@ -348,6 +348,7 @@ class Chess {
             console.log("player " + this.blackUser.username + " with color black won")
             User.updateScore(this.whiteUser.username, "loss")
             User.updateScore(this.blackUser.username, "win")
+            Chess.situation = Chess.SITUATION_NONE
             return
 
         }
@@ -355,6 +356,7 @@ class Chess {
             console.log("player " + this.whiteUser.username + " with color white won")
             User.updateScore(this.whiteUser.username, "win")
             User.updateScore(this.blackUser.username, "loss")
+            Chess.situation = Chess.SITUATION_NONE
             return
         }
 
@@ -392,6 +394,7 @@ class Chess {
         }
         else {
             Chess.situation = Chess.SITUATION_UNDID
+            this.allMoves.pop()
             this.makeMove(this.lastLocation[0], this.lastLocation[1])
             if (this.currentPlayerColor == "w") {
                 this.whiteUndo--
@@ -471,16 +474,16 @@ class Chess {
                 return
             }
 
-            let b = this.selectedPiece.move(x, y, chess.board)
-            if (b) {
+            let result = this.selectedPiece.move(x, y, chess.board)
+
+            if (result instanceof Result) {
+                this.allMoves.push(result)
                 if (Chess.situation == Chess.SITUATION_UNDID) {
                     Chess.situation = Chess.SITUATION_SELECTED
                     return
-
                 }
                 Chess.situation = Chess.SITUATION_MOVED
-            }
-            else {
+            } else {
                 Chess.situation = Chess.SITUATION_SELECTED
             }
 
@@ -491,7 +494,7 @@ class Chess {
 
     }
 
-    static showAllMoves = () => {
+    showAllMoves = () => {
 
         this.allMoves.forEach(move => {
             if(move.killedMsg){
@@ -505,7 +508,7 @@ class Chess {
     }
 
 
-    static showMoves = (playerColor) => {
+    showMoves = (playerColor) => {
 
             let moves = this.allMoves.filter(move =>
                 move.moveMsg[1] == playerColor
@@ -649,7 +652,7 @@ class Rook extends Piece {
         let [r1, c1] = CoordinateHelper.cartesianToIndeces(x, y)
 
         if (Chess.situation == Chess.SITUATION_UNDID) {
-            Chess.allMoves.pop()
+  
             board[r][c] = null
             this.x = x
             this.y = y
@@ -683,7 +686,7 @@ class Rook extends Piece {
             if (board[r1][c1] == null) {
 
                 let result = new Result(true, `${this.name}${this.color} ${this.y},${this.x} to ${y},${x}`)
-                Chess.allMoves.push(result)
+  
                 board[r][c] = null
                 this.x = x
                 this.y = y
@@ -694,7 +697,7 @@ class Rook extends Piece {
             if (this.color != board[r1][c1].color) {
 
                 let result = new Result(true, `${this.name}${this.color} ${this.y},${this.x} to ${y},${x}`, ` destroyed ${board[r1][c1].name}${board[r1][c1].color}`)
-                Chess.allMoves.push(result)
+ 
                 board[r][c] = null
                 this.x = x
                 this.y = y
@@ -726,7 +729,7 @@ class Knight extends Piece {
 
 
         if (Chess.situation == Chess.SITUATION_UNDID) {
-            Chess.allMoves.pop()
+
             board[r][c] = null
             this.x = x
             this.y = y
@@ -743,7 +746,7 @@ class Knight extends Piece {
             if (board[r1][c1] == null) {
 
                 let result = new Result(true, `${this.name}${this.color} ${this.y},${this.x} to ${y},${x}`)
-                Chess.moves.push(result)
+         
                 board[r][c] = null
                 this.x = x
                 this.y = y
@@ -754,7 +757,7 @@ class Knight extends Piece {
             if (this.color != board[r1][c1].color) {
 
                 let result = new Result(true, `${this.name}${this.color} ${this.y},${this.x} to ${y},${x}`, ` destroyed ${board[r1][c1].name}${board[r1][c1].color}`)
-                Chess.moves.push(result)
+
                 this.x = x
                 this.y = y
                 board[r1][c1] = this
@@ -784,7 +787,7 @@ class Bishop extends Piece {
         let [r1, c1] = CoordinateHelper.cartesianToIndeces(x, y)
 
         if (Chess.situation == Chess.SITUATION_UNDID) {
-            Chess.allMoves.pop()
+
             board[r][c] = null
             this.x = x
             this.y = y
@@ -806,7 +809,7 @@ class Bishop extends Piece {
             if (board[r1][c1] == null) {
 
                 let result = new Result(true, `${this.name}${this.color} ${this.y},${this.x} to ${y},${x}`)
-                Chess.allMoves.push(result)
+      
 
                 board[r][c] = null
                 this.x = x
@@ -819,7 +822,7 @@ class Bishop extends Piece {
             if (this.color != board[r1][c1].color) {
 
                 let result = new Result(true, `${this.name}${this.color} ${this.y},${this.x} to ${y},${x}`, ` destroyed ${board[r1][c1].name}${board[r1][c1].color}`)
-                Chess.allMoves.push(result)
+                
 
                 board[r][c] = null
                 this.x = x
@@ -849,7 +852,7 @@ class Queen extends Piece {
         let [r1, c1] = CoordinateHelper.cartesianToIndeces(x, y)
 
         if (Chess.situation == Chess.SITUATION_UNDID) {
-            Chess.allMoves.pop()
+     
 
             board[r][c] = null
             this.x = x
@@ -894,7 +897,7 @@ class Queen extends Piece {
             if (board[r1][c1] == null) {
 
                 let result = new Result(true, `${this.name}${this.color} ${this.y},${this.x} to ${y},${x}`)
-                Chess.allMoves.push(result)
+         
 
                 board[r][c] = null
                 this.x = x
@@ -906,7 +909,7 @@ class Queen extends Piece {
             if (this.color != board[r1][c1].color) {
 
                 let result = new Result(true, `${this.name}${this.color} ${this.y},${this.x} to ${y},${x}`, ` destroyed ${board[r1][c1].name}${board[r1][c1].color}`)
-                Chess.allMoves.push(result)
+                
 
                 board[r][c] = null
                 this.x = x
@@ -938,7 +941,7 @@ class King extends Piece {
 
 
         if (Chess.situation == Chess.SITUATION_UNDID) {
-            Chess.allMoves.pop()
+          
 
             board[r][c] = null
             this.x = x
@@ -956,7 +959,7 @@ class King extends Piece {
             if (board[r1][c1] == null) {
 
                 let result = new Result(true, `${this.name}${this.color} ${this.y},${this.x} to ${y},${x}`)
-                Chess.allMoves.push(result)
+              
 
                 board[r][c] = null
                 this.x = x
@@ -968,7 +971,7 @@ class King extends Piece {
             if (this.color != board[r1][c1].color) {
 
                 let result = new Result(true, `${this.name}${this.color} ${this.y},${this.x} to ${y},${x}`, ` destroyed ${board[r1][c1].name}${board[r1][c1].color}`)
-                Chess.allMoves.push(result)
+              
 
                 board[r][c] = null
                 this.x = x
@@ -997,7 +1000,6 @@ class Pawn extends Piece {
         let [r, c] = CoordinateHelper.cartesianToIndeces(this.x, this.y)
         let [r1, c1] = CoordinateHelper.cartesianToIndeces(x, y)
         if (Chess.situation == Chess.SITUATION_UNDID) {
-            Chess.allMoves.pop()
 
             board[r][c] = null
             this.x = x
@@ -1011,7 +1013,6 @@ class Pawn extends Piece {
                 if ((r - r1) == 1 && c == c1 && board[r1][c1] == null) {
 
                     let result = new Result(true, `${this.name}${this.color} ${this.y},${this.x} to ${y},${x}`)
-                    Chess.allMoves.push(result)
 
                     board[r][c] = null
                     this.x = x
@@ -1023,7 +1024,6 @@ class Pawn extends Piece {
                 else if ((r - r1) == 1 && Math.abs(c1 - c) == 1 && board[r1][c1] != null && this.color != board[r1][c1].color) {
 
                     let result = new Result(true, `${this.name}${this.color} ${this.y},${this.x} to ${y},${x}`, ` destroyed ${board[r1][c1].name}${board[r1][c1].color}`)
-                    Chess.allMoves.push(result)
 
                     board[r][c] = null
                     this.x = x
@@ -1041,7 +1041,7 @@ class Pawn extends Piece {
                     }
 
                     let result = new Result(true, `${this.name}${this.color} ${this.y},${this.x} to ${y},${x}`)
-                    Chess.allMoves.push(result)
+       
 
                     board[r][c] = null
                     this.x = x
@@ -1062,7 +1062,7 @@ class Pawn extends Piece {
                 if ((r1 - r) == 1 && c == c1 && board[r1][c1] == null) {
 
                     let result = new Result(true, `${this.name}${this.color} ${this.y},${this.x} to ${y},${x}`)
-                    Chess.allMoves.push(result)
+                
 
                     board[r][c] = null
                     this.x = x
@@ -1074,7 +1074,7 @@ class Pawn extends Piece {
                 else if ((r1 - r) == 1 && Math.abs(c1 - c) == 1 && board[r1][c1] != null && this.color != board[r1][c1].color) {
 
                     let result = new Result(true, `${this.name}${this.color} ${this.y},${this.x} to ${y},${x}`, ` destroyed ${board[r1][c1].name}${board[r1][c1].color}`)
-                    Chess.allMoves.push(result)
+      
 
                     board[r][c] = null
                     this.x = x
@@ -1092,7 +1092,7 @@ class Pawn extends Piece {
                     }
 
                     let result = new Result(true, `${this.name}${this.color} ${this.y},${this.x} to ${y},${x}`)
-                    Chess.allMoves.push(result)
+        
 
                     board[r][c] = null
                     this.x = x
@@ -1196,11 +1196,11 @@ rl.on('line', function (line) {
         chess.undoNumber()
     }
     else if (parts[0] == "show_moves" && parts[1] == "-all" && chess.whiteUser != null) {
-        Chess.showAllMoves()
+        chess.showAllMoves()
 
     }
     else if (parts[0] == "show_moves" && chess.whiteUser != null) {
-        Chess.showMoves(chess.currentPlayerColor)
+        chess.showMoves(chess.currentPlayerColor)
 
     }
 
@@ -1221,3 +1221,6 @@ rl.on('line', function (line) {
     }
 
 })
+
+
+
